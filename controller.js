@@ -21,17 +21,17 @@ module.exports = {
     getCountries: (req, res) =>{
         sequelize.query(`
         SELECT * FROM countries
-        ORDER BY rating DESC`)
+        `)
         .then(dbRes => 
             res.status(200).send(dbRes[0]))
 
     },
     createCity: (req,res) => {
-        let {name,rating,country_id} = req.body
+        let {name, rating, countryId} = req.body
         console.log(req.body)
         sequelize.query(`
         INSERT INTO cities (name, rating, country_id)
-        VALUES ('${name}', '${rating}', ${country_id})`)
+        VALUES ('${name}', ${rating}, ${countryId})`)
         .then(dbRes => 
             res.status(200).send(dbRes[0]))
 
@@ -42,7 +42,7 @@ module.exports = {
         sequelize.query(`
         DELETE
         FROM cities
-        WHERE city_id = ${city_id}
+        WHERE city_id = ${id}
         `)
         .then(dbRes => 
             res.status(200).send(dbRes[0]))
@@ -53,10 +53,11 @@ module.exports = {
 
     getCities: (req, res) => {
         sequelize.query(`
-            SELECT ci.name AS city, ci.rating, co.name AS country,
+            SELECT ci.city_id, ci.name AS city, ci.rating, co.country_id, co.name AS country
             FROM countries AS co
             JOIN cities AS ci
-            ON co.country_id = ci.country_id`)
+            ON co.country_id = ci.country_id
+            ORDER BY ci.rating DESC`)
             .then(dbRes => 
                 res.status(200).send(dbRes[0]))
     
@@ -80,7 +81,6 @@ module.exports = {
                 rating INTEGER NOT NULL,
                 country_id INTEGER NOT NULL REFERENCES countries(country_id));
 
-               
             insert into countries (name)
             values ('Afghanistan'),
             ('Albania'),
